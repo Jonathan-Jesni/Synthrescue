@@ -3,14 +3,13 @@ __pycache__/
 *.py[cod]
 *$py.class
 .ipynb_checkpoints/
+*.cache
 
 # --- Dataset / Data (Local only) ---
-# This ignores the folders but keeps the directory structure if you add a .gitkeep
 dataset/images/train/
 dataset/images/val/
 dataset/labels/train/
 dataset/labels/val/
-# If you have raw zip files or old datasets
 dataset/*.zip
 dataset/*.rar
 
@@ -18,10 +17,18 @@ dataset/*.rar
 *.pt
 *.onnx
 *.engine
-# Ignores all training run folders
 script/runs/
 script/runs_v1_baseline/
 script/synth_rescue_v2_production/
+args.yaml
+results.csv
+results.png
+confusion_matrix*.png
+labels.jpg
+Box*_curve.png
+train_batch*.jpg
+val_batch*.jpg
+val_pred*.jpg
 
 # --- Blender / 3D Assets ---
 *.blend1
@@ -30,7 +37,6 @@ script/synth_rescue_v2_production/
 *.blend4
 *.blend5
 quit.blend
-# Keep your master blend files, but ignore temporary lock files
 *.blend@
 
 # --- Environments / Local Config ---

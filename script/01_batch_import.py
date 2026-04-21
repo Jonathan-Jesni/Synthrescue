@@ -2,7 +2,7 @@ import bpy
 import os
 
 # Set this to your new flattened folder path
-MASTER_FOLDER = r"D:\Projects\HACK2SKILL\models\master_import"
+MASTER_FOLDER = r"D:\Projects\HACK2SKILL\Synthrescue\models\master_import"
 
 def get_class_id(filename):
     """Determines YOLO class based on the downloaded file's name."""
