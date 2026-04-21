@@ -1,0 +1,9 @@
+# D:\Projects\HACK2SKILL\Synthrescue\dataset\data.yaml
+
+path: D:/Projects/HACK2SKILL/Synthrescue/dataset
+train: images/train  # Updated for 80/20 split
+val: images/val      # Updated for 80/20 split
+
+names:
+  0: Trapped_Person
+  1: Rubble
