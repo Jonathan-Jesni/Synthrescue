@@ -4,7 +4,6 @@ path: D:/Projects/HACK2SKILL/Synthrescue/dataset
 train: images/train
 val: images/val
 
-nc: 2 
+nc: 1
 names:
-  0: Trapped_Person
-  1: Rubble
+  0: Trapped_Survivor
