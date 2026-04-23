@@ -2,7 +2,7 @@ import os
 import glob
 
 # --- CONFIGURATION ---
-# Base path where your Roboflow dataset was extracted
+# Base path for your Roboflow data
 ROBOFLOW_BASE_DIR = r"D:\Projects\HACK2SKILL\disaster.v1i.yolov8"
 SUB_FOLDERS = ['train', 'valid', 'test']
 
@@ -39,18 +39,19 @@ def remap_all_folders():
                 if not parts:
                     continue
                 
+                # Check the first number (the class ID)
                 old_class_id = int(parts[0])
                 
-                # If the class is in our map, update it
                 if old_class_id in CLASS_MAP:
                     new_class_id = CLASS_MAP[old_class_id]
+                    # Rebuild the line with the new ID and the original coordinates
                     new_line = f"{new_class_id} " + " ".join(parts[1:]) + "\n"
                     new_lines.append(new_line)
                 else:
-                    # Keep lines that aren't in the map (optional)
+                    # Keep original if it's not in the map (just in case)
                     new_lines.append(line)
             
-            # Overwrite with corrected labels
+            # Save the corrected labels back to the file
             with open(file_path, 'w') as file:
                 file.writelines(new_lines)
             
@@ -59,7 +60,7 @@ def remap_all_folders():
             
         print(f"  📂 {folder}: Remapped {folder_count} files.")
 
-    print(f"\n✅ SUCCESS: Remapped {total_remapped} total files across all Roboflow sets!")
+    print(f"\n✅ SUCCESS: Remapped {total_remapped} total files across all sets!")
 
 if __name__ == "__main__":
     remap_all_folders()

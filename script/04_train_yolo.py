@@ -1,28 +1,31 @@
 from ultralytics import YOLO
 
 def train_production_v2():
-    # 1. Load the pre-trained Nano model as a baseline
+    # 1. Load the pre-trained Nano model (Optimal for real-time drone latency)
     model = YOLO('yolov8n.pt') 
 
     # 2. Start the Phase 2 Training Loop
     results = model.train(
         data=r'D:\Projects\HACK2SKILL\Synthrescue\dataset\data.yaml',
         epochs=100,           
-        patience=25,          
-        imgsz=640,
-        device=0,             # Target your RTX 5050
+        patience=25,          # Stops if no improvement for 25 epochs
+        imgsz=640,            # Matches Roboflow resize
+        batch=-1,             # 🔥 AUTO-TUNE for your RTX 5050 VRAM
+        device=0,             
         name='synth_rescue_v2_production',
-        workers=2             
+        workers=4,            # Slightly higher for 3rd-gen laptop CPUs
+        exist_ok=True,        # Overwrites the folder if you restart
+        pretrained=True       # Uses COCO weights for faster convergence
     )
 
     # 3. Final Production Evaluation
     metrics = model.val()
     
-    # FIX: Grab recall for Class 0 (Trapped_Person) specifically
-    # metrics.box.r is a list of recall values for each class
+    # Grab recall specifically for your 'Trapped_Person' (Class 0)
+    # Using .float() ensure compatibility with standard python print formatting
     recall_person = metrics.box.r[0] 
     
-    # Grab the mean recall for comparison
+    # Grab the mean recall (mR) for the whole system
     mean_recall = metrics.results_dict['metrics/recall(B)']
 
     print(f"\n--- PRODUCTION METRICS ---")
