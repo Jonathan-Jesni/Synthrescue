@@ -84,8 +84,11 @@ def get_yolo_bbox(scene, cam_obj, obj):
     xs = [c[0] for c in coords_2d]
     ys = [c[1] for c in coords_2d]
     
-    min_x, max_x = max(0.0, min(xs)), min(1.0, max(xs))
-    min_y, max_y = max(0.0, min(ys)), min(1.0, max(ys))
+    # 🛠️ FIX 1: Strictly bound ALL coordinates between 0.0 and 1.0 to prevent YOLO crashes
+    min_x = max(0.0, min(1.0, min(xs)))
+    max_x = max(0.0, min(1.0, max(xs)))
+    min_y = max(0.0, min(1.0, min(ys)))
+    max_y = max(0.0, min(1.0, max(ys)))
     
     if min_x == max_x or min_y == max_y:
         return None
@@ -97,6 +100,10 @@ def get_yolo_bbox(scene, cam_obj, obj):
     
     # Grab yolo_class tagged from your 01_batch_import script
     cls_id = obj.get("yolo_class", 1) 
+    
+    # 🛠️ FIX 2: ALIGN WITH ROBOFLOW: If it is Debris (1), ignore it completely!
+    if cls_id == 1:
+        return None
     
     return f"{cls_id} {center_x:.6f} {center_y:.6f} {width:.6f} {height:.6f}"
 

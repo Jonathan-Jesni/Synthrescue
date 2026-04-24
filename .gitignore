@@ -6,15 +6,13 @@ __pycache__/
 *.cache
 
 # --- Dataset / Data (Local only) ---
-dataset/images/train/
-dataset/images/val/
-dataset/labels/train/
-dataset/labels/val/
-dataset/*.zip
-dataset/*.rar
+dataset/
+*.zip
+*.rar
 
 # --- YOLO / Training Artifacts ---
 *.pt
+!best.pt
 *.onnx
 *.engine
 script/runs/
@@ -33,23 +31,14 @@ val_pred*.jpg
 # --- Blender / 3D Assets ---
 *.blend1
 *.blend2
-*.blend3
-*.blend4
-*.blend5
 quit.blend
-*.blend@
 
 # --- Environments / Local Config ---
 .venv/
 env/
 venv/
-ENV/
 .vscode/
-.idea/
 
 # --- OS Specific ---
 .DS_Store
-.DS_Store?
-._*
 Thumbs.db
-desktop.ini

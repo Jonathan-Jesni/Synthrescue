@@ -1,10 +1,35 @@
+import os
 from ultralytics import YOLO
 
+def clear_yolo_cache():
+    """Automatically deletes old YOLO cache files to prevent training on corrupt data."""
+    print("🧹 Checking for old YOLO cache files...")
+    cache_paths = [
+        r"D:\Projects\HACK2SKILL\Synthrescue\dataset\labels\train.cache",
+        r"D:\Projects\HACK2SKILL\Synthrescue\dataset\labels\val.cache"
+    ]
+    
+    cleared = False
+    for cache_file in cache_paths:
+        if os.path.exists(cache_file):
+            os.remove(cache_file)
+            print(f"   Deleted: {cache_file}")
+            cleared = True
+            
+    if cleared:
+        print("✅ Cache cleared. Ready for fresh training!")
+    else:
+        print("✅ No old cache found. Ready for training!")
+
 def train_production_v3():
+    # 0. Clear old cache before starting to prevent data corruption errors
+    clear_yolo_cache()
+
     # 1. Load the pre-trained Nano model
     model = YOLO('yolov8n.pt') 
 
     # 2. Start the Phase 2 Training Loop
+    print("\n🚀 Starting V3 Unified Production Training...")
     results = model.train(
         data=r'D:\Projects\HACK2SKILL\Synthrescue\dataset\data.yaml',
         epochs=200,           
@@ -19,6 +44,7 @@ def train_production_v3():
     )
 
     # 3. Final Production Evaluation
+    print("\n📊 Running final evaluation metrics...")
     metrics = model.val()
     
     # Grab recall specifically for your ONLY class now (Trapped_Survivor)
