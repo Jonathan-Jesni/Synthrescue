@@ -1,29 +1,49 @@
-# SynthRescue: Synthetic Object Detection for Disaster Relief
+# SynthRescue: Autonomous Visual Triage & Synthetic Data Pipeline
 
 ## Objective
-SynthRescue is an end-to-end computer vision pipeline designed to locate trapped survivors in disaster zones using drone-perspective imagery. The project utilizes procedurally generated synthetic data to train a YOLOv8 model for high-recall performance in complex, occluded environments.
+SynthRescue is an end-to-end computer vision pipeline designed to locate trapped survivors in disaster zones using drone-perspective imagery. Built for the **Rapid Crisis Response** track, the project utilizes a custom procedural 3D generation engine to create heavily occluded edge cases, merging them with real-world disaster data to train a highly robust YOLOv8 model. 
 
 ## Technical Architecture
-### 1. Synthetic Data Generation (Blender)
-- **Procedural Placement**: Python scripts automate the placement, rotation, and scaling of low-poly disaster assets.
-- **Heavy Occlusion Logic**: Implemented "High-Burial" simulation, forcing survivors to be partially covered by 5–12 pieces of debris to increase model robustness.
-- **Visual Contrast**: Applied high-visibility materials (Neon Green survivors vs. Terracotta Red rubble) to eliminate feature collision in low-poly environments.
+### 1. Synthetic Data Engine (Blender + Python)
+- **Procedural Placement**: Automated scripts handle the spawning, rotation, and scaling of low-poly disaster assets (survivors and debris) on a custom staging environment.
+- **Heavy Occlusion Logic**: Implemented "High-Burial" simulations, forcing survivors to be partially covered by 4–8 pieces of concrete and rebar to train the model on extreme edge cases.
+- **Domain Randomization**: Dynamic Sun positioning (lighting/shadow angles) and randomized survivor materials (Dusty Grey, Denim Blue, High-Vis Orange) prevent the model from overfitting to specific colors or lighting conditions.
+- **Zero-Manual Labeling**: Extracts 3D mesh vertices, calculates the 2D camera bounds, and programmatically enforces `0.0` to `1.0` constraints to generate mathematically perfect YOLO bounding boxes natively.
 
-### 2. Machine Learning Pipeline
-- **Dataset**: 1,000 procedurally rendered images with a professional 80/20 train/test split.
-- **Model**: YOLOv8n (Nano) optimized for high-speed edge deployment on search-and-rescue drones.
-- **Hardware**: Trained on NVIDIA GeForce RTX 5050 Laptop GPU.
+### 2. Real-World Data Unification
+- **Roboflow Merger**: Automatically ingests 3,115 real-world disaster images.
+- **Negative Sample Alignment**: Programmatically generates blank `.txt` labels for real-world images containing only rubble. This teaches the AI to actively ignore broken concrete, drastically reducing false positive rates.
 
-## Key Results (Final Production Run)
-- **Survivor Recall (Class 0)**: **98.3%** (Target: 95%)
-- **Survivor Precision**: **100%** (Zero false positives for trapped persons)
-- **mAP50**: **0.911** across all classes
+### 3. Machine Learning Pipeline
+- **Dataset**: **~6,115 total images** (3,000 Procedural Synthetic + 3,115 Real-World) with an 80/20 train/val split.
+- **Model**: YOLOv8n (Nano) optimized for high-speed edge inference on search-and-rescue drones.
+- **Hardware**: Trained natively on an NVIDIA GeForce RTX 5050 Laptop GPU using auto-batching and mixed precision.
+
+## Key Results (V3 Unified Production Model)
+Trained on highly complex, occluded, and chaotic unified data:
+- **Survivor Precision**: **96.7%** (Near-zero false alarms for rescue teams)
+- **Survivor Recall**: **73.7%** (Strong baseline for detecting heavily buried individuals)
 
 ## Project Structure
-- `/dataset`: YOLOv8 formatted images and labels organized into `train` and `val` sets.
-- `/models`: 3D asset library including survivors and disaster debris.
-- `/script`: Full automation suite including batch importers, collection organizers, and training scripts.
 
-## Innovation
-- **Zero-Manual Labeling**: Uses Blender's internal coordinate system to automatically export mathematically perfect bounding boxes, saving hundreds of manual hours.
-- **Edge-Case Simulation**: Procedurally generates thousands of unique occlusion scenarios that would be impossible to capture safely in real-world disaster zones.
+    SynthRescue/
+    ├── dataset/                    # Unified training/validation YOLO dataset
+    ├── models/                     # Source 3D GLB/FBX files (Kenney low-poly assets)
+    ├── script/                     # Core automation and ML codebase
+    │   ├── 01_batch_import.py      # Ingests and tags 3D models with YOLO classes
+    │   ├── 02_organize_col...      # Sorts assets into Blender Collections
+    │   ├── 03_generate_syn...      # The core Blender rendering & labeling engine
+    │   ├── 04_train_yolo.py        # YOLOv8 training loop with auto-cache clearing
+    │   ├── 05_split_dataset.py     # 80/20 Train/Val mathematical split
+    │   ├── 06_merge_roboflow.py    # Merges real-world data and negative samples
+    │   ├── 07_test_image.py        # Local inference testing script
+    │   └── runs/                   # YOLOv8 weight artifacts (best.pt)
+    ├── .env                        # Local secrets
+    ├── .gitignore                  # Keeps repo lightweight (ignores dataset/runs)
+    ├── requirements.txt            # Python dependencies
+    └── synth_data_master.blend     # The master Blender staging environment
+
+
+## Innovation & Impact
+- **Solving the "Missing Data" Problem**: Real-world images of people 90% buried in rubble are practically impossible to source safely. By procedurally generating these extreme edge cases, SynthRescue trains AI to find victims that the human eye misses.
+- **Cloud-Ready**: The output `best.pt` weights are exported and ready to be containerized via Docker for Google Cloud Run integration, interfacing with the Gemini API to generate real-time emergency dispatch reports.
